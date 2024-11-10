@@ -11,7 +11,9 @@ let player = {
     height: 50,
     dy: 0,
     gravity: 0.5,
-    jumpStrength: -15,  // 점프 높이 조정
+    jumpStrength: -15,  // 점프 높이
+    jumpCount: 0,       // 점프 횟수 초기화
+    maxJumps: 2,        // 최대 점프 횟수 (이단 점프 가능)
     onGround: false
 };
 
@@ -32,10 +34,12 @@ function updatePlayer() {
     player.dy += player.gravity;
     player.y += player.dy;
 
+    // 땅에 닿았을 때 점프 카운트 초기화
     if (player.y + player.height >= canvas.height - 10) {
         player.y = canvas.height - player.height - 10;
         player.dy = 0;
         player.onGround = true;
+        player.jumpCount = 0;  // 점프 횟수 초기화
     }
 }
 
@@ -69,6 +73,7 @@ function resetGame() {
     player.dy = 0;
     obstacles = [];
     score = 0;
+    player.jumpCount = 0;
 }
 
 function draw() {
@@ -87,6 +92,14 @@ function draw() {
     ctx.fillText(`Score: ${score}`, 10, 30);
 }
 
+function jump() {
+    if (player.jumpCount < player.maxJumps) {  // 최대 점프 횟수 이하일 때 점프 가능
+        player.dy = player.jumpStrength;
+        player.onGround = false;
+        player.jumpCount++;  // 점프 횟수 증가
+    }
+}
+
 function gameLoop() {
     updatePlayer();
     handleObstacles();
@@ -96,18 +109,14 @@ function gameLoop() {
 
 // 키보드 스페이스바 점프
 window.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' && player.onGround) {
-        player.dy = player.jumpStrength;
-        player.onGround = false;
+    if (e.code === 'Space') {
+        jump();
     }
 });
 
 // 모바일 터치 점프
 canvas.addEventListener('touchstart', () => {
-    if (player.onGround) {
-        player.dy = player.jumpStrength;
-        player.onGround = false;
-    }
+    jump();
 });
 
 gameLoop();
