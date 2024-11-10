@@ -11,7 +11,7 @@ let player = {
     height: 50,
     dy: 0,
     gravity: 0.5,
-    jumpStrength: -10,
+    jumpStrength: -15,  // 점프 높이 조정
     onGround: false
 };
 
